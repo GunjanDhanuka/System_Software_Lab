@@ -42,7 +42,7 @@ do
 
 	#generate another random number to get the number of repetitions
 	random=$RANDOM;
-	prev_index=index;
+	prev_index=$index;
 
 	#modulus ensures that rep is always less than count
 	rep_no=`expr $random % $count`;
@@ -59,7 +59,7 @@ do
 	
 	#If expected length is greater than allowed length,
 	#then truncate the substring to the allowed length
-	if [ $expec_len -gt $length ]
+	if [ $length -lt $expec_len ]
 	then	
 		rep_no=`expr $length - $length_of_substr`;
 	fi
@@ -68,8 +68,8 @@ do
 	i=0;
 	while [ $i -lt $rep_no ]
 	do
-		substr="$substr${alphabets:index:1}";
 		i=`expr $i + 1`;
+		substr="$substr${alphabets:index:1}";
 	done
 
 	#Update the length of current substr

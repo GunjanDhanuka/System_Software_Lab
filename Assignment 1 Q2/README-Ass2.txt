@@ -2,7 +2,7 @@ QUESTION 2
 ------------
 
 
-The Shell Script is in prg.sh file and the alphabet sequence is stored in the data.txt file.
+The Shell Script is in 200101038_Assign01_Q2.sh file and the alphabet sequence is stored in the data.txt file.
 
 Steps to run the script:
 1. Open terminal in the folder and type the following commands
@@ -22,8 +22,10 @@ quuubbbu
 quuubbbuy
 quuubbbuyk
 
+**PLEASE MAKE SURE THAT THE data.txt file contains more than one unique alphabets (as instructed by Pinaki Sir).
 
-**THE data.txt file can be changed to check for other test cases as well.
+**The output is based on random numbers so it will vary in different executions.
+**THE data.txt file can be changed to check for other test cases as well
 
 
 Gunjan Dhanuka
