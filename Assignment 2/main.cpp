@@ -14,14 +14,13 @@
 #define ONE 1
 #define NEWLINE '\n'
 #define MAXCOMS 100
-#define err(x) cout << red << x << reset << endl;
+#define err(x) cerr << red << x << reset << endl;
 const std::string red("\033[0;31m");
 const std::string green("\033[0;32m");
 const std::string blue("\033[0;34m");
 const std::string yellow("\033[0;33m");
 const std::string cyan("\033[0;36m");
 const std::string reset("\033[0m");
-
 
 using namespace std;
 
@@ -31,11 +30,9 @@ using namespace std;
 //3. input output redirection - DONE
 //4. Clean the redirection function
 
-//TODO: format the errors properly using either cerr or perror but not both
-//TODO: Add colours to the shell
 
 //  INBUILT FUNCTIONS //
-char *builtin_str[] = {
+const char* builtin_str[] = {
     "cd",
     "help",
     "exit",
@@ -45,11 +42,6 @@ char *builtin_str[] = {
     "history",
     "echo"};
 
-//LIST OF BUILTIN FUNCTION WITH THEIR RESPECTIVE FUNCTIONS//
-// int (*builtin_func[])(char **) = {
-//     &my_cd,
-//     &my_help,
-//     &my_exit};
 
 int number_of_builtins()
 {
@@ -69,7 +61,7 @@ int my_cd(char **args)
     {
         if (chdir(args[ONE]) != ZERO)
         {
-            cerr << "Error in chdir\n";
+            err("Error in chdir");
         }
     }
 
@@ -78,14 +70,14 @@ int my_cd(char **args)
 
 int my_help(char **args)
 {
-    cout << yellow << "Gunjan Dhanuka's Mini-Shell!" << reset << endl;
-    cout << cyan << "Type the name of program and arguments, press Enter to run." << reset << endl;
-    cout << cyan << "The following functions are implemented: " << reset << endl;
+    cout << green << "Gunjan Dhanuka's Mini-Shell!" << reset << endl;
+    cout << blue << "Type the name of program and arguments, press Enter to run." << reset << endl;
+    cout << blue << "The following functions are implemented: " << reset << endl;
 
     int i = ZERO;
     while (i < number_of_builtins())
     {
-        cout << " " << builtin_str[i] << endl;
+        cout << yellow << " " << builtin_str[i] << reset << endl;
         i++;
     }
 
@@ -127,7 +119,7 @@ int my_setenv(char **args)
 
     if (args[1] == NULL || args[2] == NULL)
     {
-        cerr << "Values for setenv not provided!" << endl;
+        err("Values for setenv not provided!");
     }
     else
         int value = setenv(args[1], args[2], 1);
@@ -138,7 +130,7 @@ int my_unsetenv(char **args)
 {
     if (args[ONE] == NULL)
     {
-        cerr << "No arguments provided!\n";
+        err("No arguments provided!");
     }
     else
     {
@@ -193,7 +185,7 @@ void printCurrentDir()
 {
     char cwd[READ_LINE_BUFFER_SIZE];
     getcwd(cwd, sizeof(cwd));
-    cout << green << cwd << " " << reset;
+    cout << yellow << cwd << " " << reset;
 }
 
 int read_input(char *s)
@@ -205,7 +197,7 @@ int read_input(char *s)
 
     if (!buf)
     {
-        cerr << "Allocation error in read input" << endl;
+        err("Allocation error in read input");
         exit(EXIT_FAILURE);
     }
 
@@ -250,7 +242,7 @@ int read_input(char *s)
 
             if (!buf)
             {
-                cerr << "Allocation error in readline!" << endl;
+                err("Allocation error in readline!");
                 exit(EXIT_FAILURE);
             }
         }
@@ -267,7 +259,7 @@ char **split_input(char *s)
 
     if (!tokenarr)
     {
-        cerr << "Allocation error in split input\n";
+        err("Allocation error in split input");
         exit(EXIT_FAILURE);
     }
 
@@ -284,7 +276,7 @@ char **split_input(char *s)
 
             if (!tokenarr)
             {
-                cerr << "Allocation error in split input" << endl;
+                err("Allocation error in split input");
                 exit(EXIT_FAILURE);
             }
         }
@@ -325,14 +317,14 @@ int launcher(char **args)
         //pid == ZERO shows child process being run
         if (execvp(args[ZERO], args) == -ONE)
         {
-            cerr << "Error encountered!\n";
+            err("Error encountered!");
         }
         exit(EXIT_FAILURE);
     }
     else if (pid < ZERO)
     {
         //Error while forking
-        cerr << "Error encountered!\n";
+        err("Error encountered!");
     }
     else
     {
@@ -360,11 +352,11 @@ void runsource(int pfd[], char **args)
         dup2(pfd[1], 1);
         close(pfd[0]);
         execvp(args[0], args);
-        perror(args[0]);
+        err(args[0]);
     default:
         break;
     case -1:
-        perror("fork");
+        err("Error while forking!");
         exit(1);
     }
 }
@@ -379,18 +371,18 @@ void rundest(int pfd[], char **args)
         dup2(pfd[0], 0);
         close(pfd[1]);
         execvp(args[0], args);
-        perror(args[0]);
+        err(args[0]);
     default:
         break;
     case -1:
-        perror("fork");
+        err("Error while forking!");
         exit(1);
     }
 }
 
 int pipeLauncher(char **parsed, char **piped)
 {
-    cout << "pipelauncher entry\n";
+    //cout << "pipelauncher entry\n";
     int pipefd[2];
     int pid, status;
     pipe(pipefd);
@@ -501,17 +493,18 @@ int parserPipe(char *str, char **pipedarr)
 }
 int redirection(char **args)
 {
-    
-    cout << "enter redirection\n";
+
+    //cout << "enter redirection\n";
     int status;
     int size = 0;
-    while(args[size]!=NULL){
+    while (args[size] != NULL)
+    {
         size++;
     }
     switch (fork())
     {
     case -1:
-        perror("Error in forking!");
+        err("Error in forking!");
         break;
     case 0:
     {
@@ -526,9 +519,10 @@ int redirection(char **args)
                 ++j;
                 if ((in = open(args[j], O_RDONLY)) < 0)
                 { // open file for reading
-                    perror("error in opening file!");
+                    err("Error in opening file!");
+                    return 1;
                 }
-                cout << args[j] << " File open for reading" << endl;
+                //cout << args[j] << " File open for reading" << endl;
                 dup2(in, STDIN_FILENO); // duplicate stdin to input file
                 close(in);              // close after use
                 continue;
@@ -538,7 +532,7 @@ int redirection(char **args)
             { // looking for output character
                 ++j;
                 out = creat(args[j], 0644); // create new output file
-                cout << args[j] << " open for output" << endl;
+                //cout << args[j] << " open for output" << endl;
                 dup2(out, STDOUT_FILENO); // redirect stdout to file
                 close(out);               // close after usere
                 continue;
@@ -548,21 +542,20 @@ int redirection(char **args)
             { // looking for append
                 ++j;
                 int append = open(args[j], O_CREAT | O_RDWR | O_APPEND, 0644);
-                cout << args[j] << " open for output" << endl;
+                //cout << args[j] << " open for output" << endl;
                 dup2(append, STDOUT_FILENO);
                 close(append);
                 continue;
             }
 
-
             args_clean[cleanidx++] = args[j];
-            cout << args[j] << " added to clean at index " << cleanidx-1;
+            //cout << args[j] << " added to clean at index " << cleanidx - 1;
         } // end loop
 
         args_clean[cleanidx] = NULL;
-        cout << "Running in parent" << endl;
+        //cout << "Running in parent" << endl;
         execvp(args_clean[0], args_clean);  // execute in parent
-        perror("Error in child execution"); // error
+        err("Error in child process execution"); // error
         exit(EXIT_SUCCESS);
         //return 1;
     }
@@ -577,19 +570,19 @@ int isRedirection(char **args)
     {
         if (strcmp(args[i], ">") == 0)
         {
-            cout << "> detected\n";
+            //cout << "> detected\n";
             return 1;
         }
 
         if (strcmp(args[i], "<") == 0)
         {
-            cout << "<< detected\n";
+            //cout << "<< detected\n";
             return 1;
         }
 
         if (strcmp(args[i], ">>") == 0)
         {
-            cout << ">> detected\n";
+            //cout << ">> detected\n";
             return 1;
         }
     }
@@ -621,8 +614,7 @@ int processInput(char *str, char **parsed, char **piped)
         return 3;
     }
 
-    cout << "Out of redirection\n";
-    
+    //cout << "Out of redirection\n";
 
     if (inbuiltHandler(parsed))
     {
@@ -644,7 +636,7 @@ void main_process()
     while (true)
     {
         printCurrentDir();
-        cout << blue << "200101038-shell: $ " << reset;
+        cout << cyan << "200101038-shell: $ " << reset;
         if (read_input(s))
             continue;
         // args = split_input(s);
@@ -667,8 +659,10 @@ void main_process()
                 break;
         }
 
-        if(type == 3){
-            if(redirection(args)) break;
+        if (type == 3)
+        {
+            if (redirection(args))
+                break;
         }
 
         //free up space
