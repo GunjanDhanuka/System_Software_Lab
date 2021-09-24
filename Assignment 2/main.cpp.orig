@@ -48,23 +48,12 @@ const char *builtin_str[] = {
     "history",
     "echo"};
 
-/**
-    Tells the number of built-in functions of the shell
-    @param none
-    @return number of built-in functions
-*/
 int number_of_builtins()
 {
     return sizeof(builtin_str) / sizeof(char *);
 }
 
 //IMPLEMENTATION OF BUILTIN FUNCTIONS
-
-/**
-    Changes the directory using chdir
-    @param arguments
-    @return one if executed correctly, zero if some error encountered!
-*/
 int my_cd(char **args)
 {
     if (args[ONE] == NULL)
@@ -84,11 +73,6 @@ int my_cd(char **args)
     return ONE;
 }
 
-/**
-    Prints info about the shell and its functionalities
-    @param arguments
-    @return one if executed correctly, zero if some error encountered!
-*/
 int my_help(char **args)
 {
     cout << green << "Gunjan Dhanuka's Mini-Shell!" << reset << endl;
@@ -106,22 +90,11 @@ int my_help(char **args)
     return ONE;
 }
 
-/**
-    Exits from the shell
-    @param arguments
-    @return zero for exit
-*/
 int my_exit(char **args)
 {
     return ZERO;
 }
 
-/**
-    Prints the environment variable asked for by the `arguments`;
-    if no argument is passed, then it prints the five common env varibles!
-    @param arguments
-    @return one if executed correctly, zero if some error encountered!
-*/
 int my_printenv(char **args)
 {
     //cout << "PRINTENV" << endl;
@@ -146,11 +119,6 @@ int my_printenv(char **args)
     return ONE;
 }
 
-/**
-    Changes the value of preexisting env variable or creates a new one.
-    @param arguments
-    @return one if executed correctly, zero if some error encountered!
-*/
 int my_setenv(char **args)
 {
 
@@ -163,11 +131,6 @@ int my_setenv(char **args)
     return ONE;
 }
 
-/**
-    Removes the value of the environment varible
-    @param arguments
-    @return one if executed correctly, zero if some error encountered!
-*/
 int my_unsetenv(char **args)
 {
     if (args[ONE] == NULL)
@@ -181,11 +144,6 @@ int my_unsetenv(char **args)
     return ONE;
 }
 
-/**
-    Prints the history of the shell so far since the first execution.
-    @param arguments
-    @return one if executed correctly, zero if some error encountered!
-*/
 int my_history(char **args)
 {
     ifstream hist("/tmp/history.txt");
@@ -197,11 +155,6 @@ int my_history(char **args)
     return ONE;
 }
 
-/**
-    A re-implementation of the 'echo' command of UNIX terminal.
-    @param arguments
-    @return one if executed correctly, zero if some error encountered!
-*/
 int my_echo(char **args)
 {
     int i = 1;
@@ -233,11 +186,6 @@ int my_echo(char **args)
     return ONE;
 }
 
-/**
-    Prints the current working directory ahead of the shell-prompt.
-    @param none
-    @return none
-*/
 void printCurrentDir()
 {
     char cwd[READ_LINE_BUFFER_SIZE];
@@ -245,12 +193,6 @@ void printCurrentDir()
     cout << yellow << cwd << " " << reset;
 }
 
-/**
-    Reads the input from the shell given by the user
-    using the old-school buffer mothod just for working closer to the terminal.
-    @param user_input
-    @return one if the input string was empty 
-*/
 int read_input(char *s)
 {
     int sizebuf = READ_LINE_BUFFER_SIZE;
@@ -312,11 +254,6 @@ int read_input(char *s)
     }
 }
 
-/**
-    Splits the input into different tokens separated by pre-defined delimiters.
-    @param user_input
-    @return array of strings containing the tokens
-*/
 char **split_input(char *s)
 {
     int buffersize = TOK_BUFFER_SIZE;
@@ -355,12 +292,6 @@ char **split_input(char *s)
     return tokenarr;
 }
 
-/**
-    Changes the directory using chdir
-    @param string the string to be parsed
-    @param arguments the string array to store the parsed tokens
-    @return none
-*/
 void parser(char *s, char **args)
 {
     int i = 0;
@@ -380,12 +311,6 @@ void parser(char *s, char **args)
     }
 }
 
-/**
-    Launches the process using the arguments supplied.
-    Executes the parent and then waits for the child to finish.
-    @param arguments the string array containing the parsed tokens
-    @return one if the process completed successfully
-*/
 int launcher(char **args)
 {
     pid_t pid, wpid;
@@ -422,12 +347,6 @@ int launcher(char **args)
     return ONE;
 }
 
-/**
-    Runs the first command in a piped statement.
-    @param file_descriptors_array the array containing the file descriptors for read and write of the pipe
-    @param arguments the string array containing the parsed tokens
-    @return none
-*/
 void runsource(int pfd[], char **args)
 {
     int pid;
@@ -447,12 +366,6 @@ void runsource(int pfd[], char **args)
     }
 }
 
-/**
-    Runs the second command in a piped statement.
-    @param file_descriptors_array the array containing the file descriptors for read and write of the pipe
-    @param arguments the string array containing the parsed tokens
-    @return none
-*/
 void rundest(int pfd[], char **args)
 {
     int pid;
@@ -472,12 +385,6 @@ void rundest(int pfd[], char **args)
     }
 }
 
-/**
-    Starts the pipe and then calls the runsource and rundest in order to complete the piping process.
-    @param parsed the arguments before the pipe(|) symbol
-    @param piped the arguments after the pipe(|) symbol
-    @return one if the process completed successfully
-*/
 int pipeLauncher(char **parsed, char **piped)
 {
     //cout << "pipelauncher entry\n";
@@ -498,11 +405,6 @@ int pipeLauncher(char **parsed, char **piped)
     return 1;
 }
 
-/**
-    Executes a shell-command which is not an inbuilt/piped command.
-    @param arguments the array containing the command and its arguments
-    @return one if the command is empty; else the output of launcher function
-*/
 int execute(char **args)
 {
     //int i;
@@ -515,11 +417,6 @@ int execute(char **args)
     return launcher(args);
 }
 
-/**
-    Handles the inbuilt commands of the minishell. If the command is present, it is executed.
-    @param arguments the array containing the command and its arguments
-    @return one if the command is present and successfully executed, zero if command not present
-*/
 int inbuiltHandler(char **args)
 {
     int i = 0;
@@ -581,12 +478,6 @@ int inbuiltHandler(char **args)
     }
 }
 
-/**
-    Parses the user input that contains a pipe symbol. Separates into pre-pipe and post-pipe args.
-    @param string the string input by the user
-    @param pipedArray the array which will store the arguments before and after pipe separately.
-    @return one if pipe is present and zero if no piping present.
-*/
 int parserPipe(char *str, char **pipedarr)
 {
     int i = ZERO;
@@ -605,12 +496,6 @@ int parserPipe(char *str, char **pipedarr)
     else
         return ONE;
 }
-
-/**
-    Performs redirection of one or multiple of three kinds (<, >, >>) using file descriptors that duplicate the input/output file to stdin/stdout.
-    @param arguments the array containing the command and its arguments
-    @return zero if executed successfully.
-*/
 int redirection(char **args)
 {
 
@@ -635,12 +520,10 @@ int redirection(char **args)
         for (int j = 0; j < size; j++)
         {
             if (!strcmp(args[j], "<"))
-            {
-                // looking for input character
+            { // looking for input character
                 ++j;
                 if ((in = open(args[j], O_RDONLY)) < 0)
-                {
-                    // open file for reading
+                { // open file for reading
                     err("Error in opening file!");
                     return 1;
                 }
@@ -651,8 +534,7 @@ int redirection(char **args)
             } // end input chech
 
             if (!strcmp(args[j], ">"))
-            {
-                // looking for output character
+            { // looking for output character
                 ++j;
                 out = creat(args[j], 0644); // create new output file
                 //cout << args[j] << " open for output" << endl;
@@ -662,8 +544,7 @@ int redirection(char **args)
             } // end output check
 
             if (!strcmp(args[j], ">>"))
-            {
-                // looking for append
+            { // looking for append
                 ++j;
                 int append = open(args[j], O_CREAT | O_RDWR | O_APPEND, 0644);
                 //cout << args[j] << " open for output" << endl;
@@ -688,12 +569,6 @@ int redirection(char **args)
     }
     return 0;
 }
-
-/**
-    Checks if the user input arguments contain a redirection operator.
-    @param arguments the array containing the command and its arguments
-    @return one if any of the redirection operators are present, zero otherwise.
-*/
 int isRedirection(char **args)
 {
     for (int i = 0; args[i] != NULL; i++)
@@ -719,14 +594,6 @@ int isRedirection(char **args)
     return 0;
 }
 
-
-/**
-    Handles the inbuilt commands of the minishell. If the command is present, it is executed.
-    @param str containing the input given by the user
-    @param parsed string array to store the commands and the arguments before pipe, if any.
-    @param piped string array to store the commands and its arguments after the pipe, if any.
-    @return zero if the command is inbuilt, one if the command is usual shell command, two if the user seeks piping, and three if the user seeks redirection.
-*/
 int processInput(char *str, char **parsed, char **piped)
 {
     //cout << "Process input entry\n";
@@ -764,14 +631,9 @@ int processInput(char *str, char **parsed, char **piped)
     }
 }
 
-/**
-    Driver function, contains the main infinite loop of the terminal and handles the execution of different functions from reading input to running commands.
-    @param none
-    @return none
-*/
 void main_process()
 {
-    char s[MAXCOMS];
+    char s[100];
     char *args[MAXCOMS];
     char *pipedArgs[MAXCOMS];
     //int alive = 1;
@@ -812,11 +674,6 @@ void main_process()
     }
 }
 
-/**
-    The main function of a C++ program.
-    @param none
-    @return zero if exits normally
-*/
 int main()
 {
     main_process();
